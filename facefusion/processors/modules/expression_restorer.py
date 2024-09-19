@@ -18,6 +18,7 @@ from facefusion.face_selector import find_similar_faces, sort_and_filter_faces
 from facefusion.face_store import get_reference_faces
 from facefusion.filesystem import in_directory, is_image, is_video, resolve_relative_path, same_file_extension
 from facefusion.processors import choices as processors_choices
+from facefusion.processors.live_portrait import limit_expression
 from facefusion.processors.typing import ExpressionRestorerInputs
 from facefusion.processors.typing import LivePortraitExpression, LivePortraitFeatureVolume, LivePortraitMotionPoints, LivePortraitPitch, LivePortraitRoll, LivePortraitScale, LivePortraitTranslation, LivePortraitYaw
 from facefusion.program_helper import find_argument_group
@@ -136,7 +137,7 @@ def post_process() -> None:
 def restore_expression(source_vision_frame : VisionFrame, target_face : Face, temp_vision_frame : VisionFrame) -> VisionFrame:
 	model_template = get_model_options().get('template')
 	model_size = get_model_options().get('size')
-	expression_restorer_factor = float(numpy.interp(float(state_manager.get_item('expression_restorer_factor')), [ 0, 200 ], [ 0, 2 ]))
+	expression_restorer_factor = float(numpy.interp(float(state_manager.get_item('expression_restorer_factor')), [ 0, 120 ], [ 0, 1.2 ]))
 	source_vision_frame = cv2.resize(source_vision_frame, temp_vision_frame.shape[:2][::-1])
 	source_crop_vision_frame, _ = warp_face_by_face_landmark_5(source_vision_frame, target_face.landmark_set.get('5/68'), model_template, model_size)
 	target_crop_vision_frame, affine_matrix = warp_face_by_face_landmark_5(temp_vision_frame, target_face.landmark_set.get('5/68'), model_template, model_size)
@@ -167,6 +168,7 @@ def apply_restore(source_crop_vision_frame : VisionFrame, target_crop_vision_fra
 	rotation = rotation.T.astype(numpy.float32)
 	source_expression[:, [ 0, 4, 5, 8, 9 ]] = target_expression[:, [ 0, 4, 5, 8, 9 ]]
 	source_expression = source_expression * expression_restorer_factor + target_expression * (1 - expression_restorer_factor)
+	source_expression = limit_expression(source_expression)
 	source_motion_points = scale * (motion_points @ rotation + source_expression) + translation
 	target_motion_points = scale * (motion_points @ rotation + target_expression) + translation
 	crop_vision_frame = forward_generate_frame(feature_volume, source_motion_points, target_motion_points)

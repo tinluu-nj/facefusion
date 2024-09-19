@@ -78,7 +78,17 @@
 	padding: unset;
 }
 
-:root:root:root:root .image-preview
+:root:root:root:root .image-frame
+{
+	width: 100%;
+}
+
+:root:root:root:root .image-frame > img
+{
+	object-fit: cover;
+}
+
+:root:root:root:root .image-preview.is-landscape
 {
 	position: sticky;
 	top: 0;
