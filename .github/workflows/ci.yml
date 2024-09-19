@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
  lint:
-  runs-on: ubuntu-latest
+  runs-on: self-hosted
   steps:
   - name: Checkout
     uses: actions/checkout@v4
@@ -20,9 +20,6 @@ jobs:
   - run: mypy facefusion.py install.py
   - run: mypy facefusion tests
  test:
-  strategy:
-   matrix:
-    os: [ macos-13, ubuntu-latest, windows-latest ]
   runs-on: self-hosted
   steps:
   - name: Checkout
@@ -38,7 +35,7 @@ jobs:
   - run: pytest
  report:
   needs: test
-  runs-on: ubuntu-latest
+  runs-on: self-hosted
   steps:
   - name: Checkout
     uses: actions/checkout@v4
