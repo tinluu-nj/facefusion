@@ -3,7 +3,6 @@ from typing import List, Tuple
 
 import cv2
 import numpy
-import scipy
 
 import facefusion.jobs.job_manager
 import facefusion.jobs.job_store
@@ -18,7 +17,7 @@ from facefusion.face_selector import find_similar_faces, sort_and_filter_faces
 from facefusion.face_store import get_reference_faces
 from facefusion.filesystem import in_directory, is_image, is_video, resolve_relative_path, same_file_extension
 from facefusion.processors import choices as processors_choices
-from facefusion.processors.live_portrait import limit_expression
+from facefusion.processors.live_portrait import create_rotation, limit_expression
 from facefusion.processors.typing import ExpressionRestorerInputs
 from facefusion.processors.typing import LivePortraitExpression, LivePortraitFeatureVolume, LivePortraitMotionPoints, LivePortraitPitch, LivePortraitRoll, LivePortraitScale, LivePortraitTranslation, LivePortraitYaw
 from facefusion.program_helper import find_argument_group
@@ -91,7 +90,7 @@ def register_args(program : ArgumentParser) -> None:
 	group_processors = find_argument_group(program, 'processors')
 	if group_processors:
 		group_processors.add_argument('--expression-restorer-model', help = wording.get('help.expression_restorer_model'), default = config.get_str_value('processors.expression_restorer_model', 'live_portrait'), choices = processors_choices.expression_restorer_models)
-		group_processors.add_argument('--expression-restorer-factor', help = wording.get('help.expression_restorer_factor'), type = int, default = config.get_int_value('processors.expression_restorer_factor', '100'), choices = processors_choices.expression_restorer_factor_range, metavar = create_int_metavar(processors_choices.expression_restorer_factor_range))
+		group_processors.add_argument('--expression-restorer-factor', help = wording.get('help.expression_restorer_factor'), type = int, default = config.get_int_value('processors.expression_restorer_factor', '80'), choices = processors_choices.expression_restorer_factor_range, metavar = create_int_metavar(processors_choices.expression_restorer_factor_range))
 		facefusion.jobs.job_store.register_step_keys([ 'expression_restorer_model','expression_restorer_factor' ])
 
 
@@ -137,7 +136,7 @@ def post_process() -> None:
 def restore_expression(source_vision_frame : VisionFrame, target_face : Face, temp_vision_frame : VisionFrame) -> VisionFrame:
 	model_template = get_model_options().get('template')
 	model_size = get_model_options().get('size')
-	expression_restorer_factor = float(numpy.interp(float(state_manager.get_item('expression_restorer_factor')), [ 0, 120 ], [ 0, 1.2 ]))
+	expression_restorer_factor = float(numpy.interp(float(state_manager.get_item('expression_restorer_factor')), [ 0, 100 ], [ 0, 1.2 ]))
 	source_vision_frame = cv2.resize(source_vision_frame, temp_vision_frame.shape[:2][::-1])
 	source_crop_vision_frame, _ = warp_face_by_face_landmark_5(source_vision_frame, target_face.landmark_set.get('5/68'), model_template, model_size)
 	target_crop_vision_frame, affine_matrix = warp_face_by_face_landmark_5(temp_vision_frame, target_face.landmark_set.get('5/68'), model_template, model_size)
@@ -164,13 +163,12 @@ def apply_restore(source_crop_vision_frame : VisionFrame, target_crop_vision_fra
 	feature_volume = forward_extract_feature(target_crop_vision_frame)
 	source_expression = forward_extract_motion(source_crop_vision_frame)[5]
 	pitch, yaw, roll, scale, translation, target_expression, motion_points = forward_extract_motion(target_crop_vision_frame)
-	rotation = scipy.spatial.transform.Rotation.from_euler('xyz', [ pitch, yaw, roll ], degrees = True).as_matrix()
-	rotation = rotation.T.astype(numpy.float32)
+	rotation = create_rotation(pitch, yaw, roll)
 	source_expression[:, [ 0, 4, 5, 8, 9 ]] = target_expression[:, [ 0, 4, 5, 8, 9 ]]
 	source_expression = source_expression * expression_restorer_factor + target_expression * (1 - expression_restorer_factor)
 	source_expression = limit_expression(source_expression)
-	source_motion_points = scale * (motion_points @ rotation + source_expression) + translation
-	target_motion_points = scale * (motion_points @ rotation + target_expression) + translation
+	source_motion_points = scale * (motion_points @ rotation.T + source_expression) + translation
+	target_motion_points = scale * (motion_points @ rotation.T + target_expression) + translation
 	crop_vision_frame = forward_generate_frame(feature_volume, source_motion_points, target_motion_points)
 	return crop_vision_frame
 
