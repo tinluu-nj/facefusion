@@ -185,10 +185,6 @@ check_tools() {
         log_error "jq is required but not installed. Please install jq."
         exit 1
     fi
-    if ! command -v conda &> /dev/null; then
-        log_error "Conda is required but not installed. Please install Conda."
-        exit 1
-    fi
     log_info "All required tools are available"
 }
 

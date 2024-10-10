@@ -1,0 +1,21 @@
+services:
+ facefusion-cuda:
+  build:
+   context: .
+   dockerfile: Dockerfile.cuda.vid
+  command: [ './ff_job_vid_directory.sh', './src.d/' ]
+  volumes:
+  - ./.assets:/facefusion/.assets
+  - ./.caches:/facefusion/.caches
+  - ./.jobs:/facefusion/.jobs
+  - /home/tinluu/Vault/Downloads/@notsophiesilva:/facefusion/src.d
+  ports:
+  - 7870:7860
+  deploy:
+   resources:
+    reservations:
+     devices:
+     - driver: nvidia
+       count: all
+       capabilities: [gpu, video]
+  runtime: nvidia
