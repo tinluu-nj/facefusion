@@ -10,11 +10,8 @@ from watchdog.observers import Observer
 import argparse
 
 from facefusion.jobs import (
-    job_helper, 
-    job_list, 
-    job_manager, 
-    job_runner, 
-    job_store
+    job_helper,
+    job_manager
 )
 from facefusion import core
 
@@ -30,7 +27,8 @@ from FileProcessorHandler import (
 # Global variables for directory paths
 JOB_DIRECTORY = "./.jobs/"
 BACKUP_DIRECTORY = "/home/tinluu/Record/Backup/"
-PHOTO_DIRECTORY = "/home/tinluu/Nextcloud/Record/Photo/"
+# PHOTO_DIRECTORY = "/home/tinluu/Nextcloud/Record/Photo/"
+PHOTO_DIRECTORY = "/home/tinluu/Vault/Downloads/"
 CONFIG_FILE = "ESTHERA-conf.json"
 LOG_FILE = "ff_job_automate.log"
 
@@ -51,7 +49,7 @@ logger = logging.getLogger("ff_job_automate")
 with open(CONFIG_FILE, 'r') as file:
     generic_arg = json.load(file)
 
-def process_monitoring_directory(target_path: str, polling: bool) -> None:
+def process_monitoring_directory(target_path, polling: bool) -> None:
     """
     Monitor the target directory for new files and process them.
     """
@@ -81,7 +79,7 @@ def process_monitoring_directory(target_path: str, polling: bool) -> None:
     # Process the directory
     process_directory(target_path, processing_queue, processed_files)
 
-def process_directory(target_path: str, processing_queue: str, processed_files: str)  -> None:
+def process_directory(target_path, processing_queue, processed_files)  -> None:
     """
     Process the files in the target directory using the event handler and observer.
     """
@@ -102,7 +100,7 @@ def process_directory(target_path: str, processing_queue: str, processed_files: 
         observer.stop()
     observer.join()
 
-def process_file_queue(processing_queue: str, processed_files: str) -> None:
+def process_file_queue(processing_queue, processed_files) -> None:
     """
     Process files from the queue and submit jobs.
     """
