@@ -15,3 +15,6 @@ do
   echo "$file"
   ./ff_job_vid.sh -t $file -o /facefusion/.caches/
 done
+
+python facefusion.py job-run-all --execution-providers cuda --execution-thread-count 4 --execution-queue-count 4 --log-level debug
+

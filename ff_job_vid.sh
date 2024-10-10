@@ -24,7 +24,7 @@ check_template_exists() {
 
 # Generate timestamp for job ID
 generate_job_id() {
-    local timestamp=$(date +"%Y-%m-%d-%H-%M-%S")
+    local timestamp=$(date +"%Y-%m-%d-%H-%M-%S-%3N")
     echo "ESTHERA-vid-${timestamp}"  # Output the generated job ID
 }
 
