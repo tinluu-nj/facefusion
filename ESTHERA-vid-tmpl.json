@@ -64,7 +64,8 @@
                 "skip_audio": null,
                 "processors": [
                     "face_swapper",
-                    "face_enhancer"
+                    "face_enhancer",
+					"frame_enhancer"
                 ],
                 "age_modifier_model": "styleganex_age",
                 "age_modifier_direction": 0,

@@ -60,7 +60,7 @@ validate_paths() {
     if [ -d "$output_path" ]; then
         output_path="${output_path%/}/${target_filename}"
     elif [ -f "$output_path" ]; then
-        log_error "Output file already exists!"
+        log_error "Output file already exists: $output_path"
         return 1
     else
         local output_extension=$(get_filename_extension "$output_path")
@@ -218,6 +218,9 @@ main() {
         TARGET_PATH=$(echo "$paths" | cut -d'|' -f1)
         OUTPUT_PATH=$(echo "$paths" | cut -d'|' -f2)
     fi
+
+	echo $TARGET_PATH
+	echo $OUTPUT_PATH
 
     # Validate paths
     validated_paths=$(validate_paths "$TARGET_PATH" "$OUTPUT_PATH")

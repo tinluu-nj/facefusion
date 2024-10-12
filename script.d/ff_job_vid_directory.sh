@@ -13,8 +13,8 @@ find "$directory" -type f | while IFS= read -r file
 do
   # Print the full path of each file
   echo "$file"
-  ./ff_job_vid.sh -t $file -o /facefusion/.caches/
+  ./ff_job_vid.sh -t $file -o .
+  python facefusion.py job-run-all --execution-providers cuda --execution-thread-count 4 --execution-queue-count 4 --log-level debug
 done
 
-python facefusion.py job-run-all --execution-providers cuda --execution-thread-count 4 --execution-queue-count 4 --log-level debug
 
