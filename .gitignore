@@ -4,3 +4,9 @@ __pycache__
 .jobs
 .idea
 .vscode
+__pycache__
+processed
+*.pyc
+src.d
+*.mp4
+tmp
