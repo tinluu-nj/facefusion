@@ -110,7 +110,9 @@ def process_file_queue(processing_queue, processed_files) -> None:
 
     # Process the first file in the queue
     file_path = processing_queue.pop(0)
-    if file_path not in processed_files and os.path.exists(file_path) and core.is_image(file_path):
+    if str(file_path).endswith(".mp4"):
+        logger.info(f"Video file: {file_path}")
+    elif file_path not in processed_files and os.path.exists(file_path) and core.is_image(file_path):
         logger.info(f"Processing: {file_path}")
         directory, filename = os.path.split(file_path)
         name, ext = os.path.splitext(filename)
