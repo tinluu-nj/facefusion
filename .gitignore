@@ -9,4 +9,9 @@ processed
 *.pyc
 src.d
 *.mp4
-tmp
+output.d
+source.d
+target.d
+temp.d
+sample
+*.log

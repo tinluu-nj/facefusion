@@ -12,6 +12,7 @@ from facefusion.typing import DownloadScope, Fps, InferencePool, ModelOptions, M
 from facefusion.vision import detect_video_fps, get_video_frame, read_image
 
 PROBABILITY_LIMIT = 0.80
+# PROBABILITY_LIMIT = 1.00
 RATE_LIMIT = 10
 STREAM_COUNTER = 0
 

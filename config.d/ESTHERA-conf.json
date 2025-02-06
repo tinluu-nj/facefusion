@@ -1,9 +1,10 @@
 {
+    "temp_path": "./temp.d",
     "source_paths": [
-        "/home/tinluu/Record/Esthera/unsorted/SRC.jpg"
+        "./source.d/SRC.jpg"
     ],
     "target_path": "/home/tinluu/Record/Esthera/unsorted/OIG.3pcDUnRVXEYLYXJ9cZKy.jpg",
-    "output_path": "./output.jpg",
+    "output_path": "./out.d/output.jpg",
     "face_detector_model": "yoloface",
     "face_detector_size": "640x640",
     "face_detector_angles": [
